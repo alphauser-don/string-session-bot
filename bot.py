@@ -4,7 +4,7 @@ import re
 import sys
 import time
 import sqlite3
-from datetime import datetime, time as dt_time  # Avoids conflict
+from datetime import datetime, time as dt_time
 from collections import defaultdict
 from dotenv import load_dotenv
 from telegram import Update, InputFile
@@ -17,7 +17,8 @@ from telegram.ext import (
     filters
 )
 from client import SessionManager
-from pyrogram.errors import SessionPasswordNeeded  # Added missing import
+from pyrogram import Client
+from pyrogram.errors import SessionPasswordNeeded
 
 load_dotenv()
 
