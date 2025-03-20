@@ -1,0 +1,10 @@
+{
+    "en": {
+        "welcome": "👋 Welcome {name}! Use /genstring to start.",
+        "session_backup": "🔐 Here's your session backup:"
+    },
+    "es": {
+        "welcome": "👋 ¡Bienvenido {name}! Usa /genstring para comenzar.",
+        "session_backup": "🔐 Aquí está tu copia de seguridad:"
+    }
+}
