@@ -4,7 +4,7 @@ import re
 import sys
 import time
 import sqlite3
-from datetime import datetime, time
+from datetime import datetime, time as dt_time  # Avoids conflict
 from collections import defaultdict
 from dotenv import load_dotenv
 from telegram import Update, InputFile
@@ -43,9 +43,10 @@ OWNER_ID = int(os.getenv('OWNER_ID'))
 # Rate limiting
 user_attempts = defaultdict(int)
 
-async def handle_error(update: Update, context: ContextTypes.DEFAULT_TYPE, error_message: str):
-    await update.message.reply_text(
-        f"❌ Error: {error_message}\n\n"
+async def handle_error(update: Update, context: ContextTypes.DEFAULT_TYPE, error_message="Unknown error"):
+    if update and update.message:
+        await update.message.reply_text(f"❌ Error: {error_message}")
+    logger.warning(f"Error occurred: {error_message}")\n\n"
         "If the issue persists, please contact @rishabh.zz for support."
     )
     logger.error(f"Error occurred: {error_message}")
@@ -289,9 +290,11 @@ def main():
     # Schedule daily cleanup
     application.job_queue.run_daily(
         daily_cleanup,
-        time=time(hour=3, minute=0),  # Correct time specification
+        time=dt_time(hour=3, minute=0)  # Fixes conflict
         name="daily_cleanup"
     )
+application.add_handler(CommandHandler("start", start))
+application.add_handler(CommandHandler("revoke", revoke_session))
 
     application.run_polling()
 
