@@ -286,12 +286,11 @@ def main():
     application.add_handler(CommandHandler('updatebot', update_bot))
 
     # Schedule daily cleanup
-   application.job_queue.run_daily(
-    daily_cleanup,
-    time=time(hour=3, minute=0),  # Use `time` directly
-    name="daily_cleanup"
-   )
-
+    application.job_queue.run_daily(
+        daily_cleanup,
+        time=time(hour=3, minute=0),  # Correct time specification
+        name="daily_cleanup"
+    )
 
     application.run_polling()
 
