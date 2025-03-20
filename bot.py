@@ -4,7 +4,7 @@ import re
 import sys
 import time
 import sqlite3
-from datetime import datetime, time  # Fixed import
+from datetime import datetime, time
 from collections import defaultdict
 from dotenv import load_dotenv
 from telegram import Update, InputFile
@@ -45,7 +45,7 @@ user_attempts = defaultdict(int)
 async def handle_error(update: Update, context: ContextTypes.DEFAULT_TYPE, error_message: str):
     await update.message.reply_text(
         f"❌ Error: {error_message}\n\n"
-        "If the issue persists, please contact @rishabh.zz for support."
+        "If the issue persists, please contact @rishabh_zz for support."
     )
     logger.error(f"Error occurred: {error_message}")
 
@@ -73,22 +73,34 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_api_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_input = update.message.text.strip()
+    
+    # Validate API ID (must be a number)
     if not re.match(r"^\d+$", user_input):
-        await update.message.reply_text("❌ Invalid API_ID. Only numbers allowed. Try again:")
+        await update.message.reply_text(
+            "❌ Invalid API ID. Only numbers are allowed. Please re-enter your API ID:"
+        )
         return STATE_API_ID
     
     try:
-        context.user_data['api_id'] = int(user_input)
-        await update.message.reply_text("✅ API_ID accepted! Send your API_HASH:")
+        api_id = int(user_input)
+        if api_id < 1:  # Ensure API ID is a positive number
+            raise ValueError
+        context.user_data['api_id'] = api_id
+        await update.message.reply_text("✅ API ID accepted! Now send your API HASH:")
         return STATE_API_HASH
     except ValueError:
-        await handle_error(update, context, "Invalid API_ID format")
+        await handle_error(update, context, "Invalid API ID. Please enter a valid number.")
         return STATE_API_ID
 
 async def handle_api_hash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_input = update.message.text.strip()
-    if not user_input:
-        await update.message.reply_text("❌ API_HASH cannot be empty. Try again:")
+    
+    # Validate API Hash (must be 32 characters, alphanumeric)
+    if not re.match(r"^[a-fA-F0-9]{32}$", user_input):
+        await update.message.reply_text(
+            "❌ Invalid API HASH. It must be a 32-character alphanumeric string.\n"
+            "Please re-enter your API HASH:"
+        )
         return STATE_API_HASH
     
     context.user_data['api_hash'] = user_input
@@ -285,7 +297,7 @@ def main():
     application.add_handler(CommandHandler('stats', show_stats))
     application.add_handler(CommandHandler('updatebot', update_bot))
 
-    # Schedule daily cleanup - Fixed time specification
+    # Schedule daily cleanup
     application.job_queue.run_daily(
         daily_cleanup,
         time=time(hour=3, minute=0),
