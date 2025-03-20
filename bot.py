@@ -4,7 +4,7 @@ import re
 import sys
 import time
 import sqlite3
-from datetime import datetime
+from datetime import datetime, time
 from collections import defaultdict
 from dotenv import load_dotenv
 from telegram import Update, InputFile
@@ -286,11 +286,12 @@ def main():
     application.add_handler(CommandHandler('updatebot', update_bot))
 
     # Schedule daily cleanup
-    application.job_queue.run_daily(
-        daily_cleanup,
-        time=datetime.time(hour=3, minute=0),  # 3 AM daily
-        name="daily_cleanup"
-    )
+   application.job_queue.run_daily(
+    daily_cleanup,
+    time=time(hour=3, minute=0),  # Use `time` directly
+    name="daily_cleanup"
+   )
+
 
     application.run_polling()
 
