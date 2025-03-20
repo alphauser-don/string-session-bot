@@ -187,37 +187,19 @@ async def handle_2fa(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def finalize_session(update: Update, context: ContextTypes.DEFAULT_TYPE):
     client = context.user_data['client']
     try:
+        # Generate and save the string session
         string_session = await client.export_session_string()
+        
+        # Send the session to the user's Saved Messages
         await client.send_message("me", f"**String Session:**\n`{string_session}`")
-        await send_session_backup(update, string_session)
-        await log_usage(update.effective_user.id)
-        await update.message.reply_text("✅ Success! Check Saved Messages.")
+        
+        # Notify the user
+        await update.message.reply_text("✅ Success! Check your Saved Messages for the session.")
     except Exception as e:
-        await update.message.reply_text(f"⚠️ Generated session:\n`{string_session}`")
-    await client.disconnect()
+        await handle_error(update, context, f"Failed to save session: {str(e)}")
+    finally:
+        await client.disconnect()
     return ConversationHandler.END
-
-async def send_session_backup(update: Update, session_string: str):
-    try:
-        with open("session.txt", "w") as f:
-            f.write(session_string)
-        await update.message.reply_document(
-            document=InputFile("session.txt"),
-            caption="🔐 Session Backup - Keep this secure!"
-        )
-        os.remove("session.txt")
-    except Exception as e:
-        await handle_error(update, context, f"Backup failed: {str(e)}")
-
-async def log_usage(user_id: int):
-    try:
-        with sqlite3.connect("analytics.db") as conn:
-            conn.execute("""
-                INSERT INTO usage (user_id, timestamp)
-                VALUES (?, ?)
-            """, (user_id, int(time.time())))
-    except Exception as e:
-        logger.error(f"Usage logging failed: {str(e)}")
 
 async def cleanup_session(context: ContextTypes.DEFAULT_TYPE):
     try:
