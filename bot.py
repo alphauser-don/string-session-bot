@@ -4,7 +4,7 @@ import re
 import sys
 import time
 import sqlite3
-from datetime import datetime, time as dt_time
+from datetime import datetime, time  # Fixed import
 from collections import defaultdict
 from dotenv import load_dotenv
 from telegram import Update, InputFile
@@ -17,8 +17,6 @@ from telegram.ext import (
     filters
 )
 from client import SessionManager
-from pyrogram import Client
-from pyrogram.errors import SessionPasswordNeeded
 
 load_dotenv()
 
@@ -44,10 +42,9 @@ OWNER_ID = int(os.getenv('OWNER_ID'))
 # Rate limiting
 user_attempts = defaultdict(int)
 
-async def handle_error(update: Update, context: ContextTypes.DEFAULT_TYPE, error_message="Unknown error"):
-    if update and update.message:
-        await update.message.reply_text(f"❌ Error: {error_message}")
-    logger.warning(f"Error occurred: {error_message}")\n\n"
+async def handle_error(update: Update, context: ContextTypes.DEFAULT_TYPE, error_message: str):
+    await update.message.reply_text(
+        f"❌ Error: {error_message}\n\n"
         "If the issue persists, please contact @rishabh.zz for support."
     )
     logger.error(f"Error occurred: {error_message}")
@@ -288,14 +285,12 @@ def main():
     application.add_handler(CommandHandler('stats', show_stats))
     application.add_handler(CommandHandler('updatebot', update_bot))
 
-    # Schedule daily cleanup
+    # Schedule daily cleanup - Fixed time specification
     application.job_queue.run_daily(
         daily_cleanup,
-        time=dt_time(hour=3, minute=0)  # Fixes conflict
+        time=time(hour=3, minute=0),
         name="daily_cleanup"
     )
-application.add_handler(CommandHandler("start", start))
-application.add_handler(CommandHandler("revoke", revoke_session))
 
     application.run_polling()
 
