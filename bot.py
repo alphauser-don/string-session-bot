@@ -17,6 +17,7 @@ from telegram.ext import (
     filters
 )
 from client import SessionManager
+from pyrogram.errors import SessionPasswordNeeded  # Added missing import
 
 load_dotenv()
 
