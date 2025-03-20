@@ -99,4 +99,3 @@ class SessionManager:
         except Exception as e:
             logger.error(f"Session cleanup failed: {str(e)}")
             raise RuntimeError("Session cleanup operation failed") from e
-            
