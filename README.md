@@ -18,7 +18,7 @@ sudo apt update && sudo apt install python3-venv
 sudo apt install -y python3 python3-venv python3-pip git nginx
 python3 -m venv venv
 source venv/bin/activate
-git clone https://github.com/yourusername/string-session-bot
+git clone https://github.com/alphauser-don/string-session-bot
 cd string-session-bot
 pip install -r requirements.txt
 
