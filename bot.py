@@ -53,7 +53,21 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     await update.message.reply_text(
         f"👋 Welcome {user.first_name}!\n\n"
-        "Use /genstring to generate your Telegram String Session."
+        "Use /genstring to generate your Telegram String Session.\n"
+        "Use /cmds to see all available commands."
+    )
+
+async def cmds(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    commands = [
+        "/start - Start the bot",
+        "/genstring - Generate a string session",
+        "/revoke - Revoke your session (if active)",
+        "/cmds - List all available commands",
+        "/stats - View bot statistics (owner only)",
+        "/updatebot - Update the bot (owner only)"
+    ]
+    await update.message.reply_text(
+        "📜 Available Commands:\n\n" + "\n".join(commands)
     )
 
 async def gen_string(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -120,7 +134,7 @@ async def handle_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
         client = await session_manager.create_client(
             context.user_data['api_id'],
             context.user_data['api_hash'],
-            user_id
+            f"session_{user_id}"  # Unique session name for each user
         )
         await client.connect()
         sent_code = await client.send_code(user_input)
@@ -292,6 +306,7 @@ def main():
     )
 
     application.add_handler(CommandHandler('start', start))
+    application.add_handler(CommandHandler('cmds', cmds))
     application.add_handler(conv_handler)
     application.add_handler(CommandHandler('revoke', revoke_session))
     application.add_handler(CommandHandler('stats', show_stats))
